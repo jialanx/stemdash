@@ -1,5 +1,6 @@
-import React from "react";
-import './index.css'
+import React, { useState } from "react";
+import { UserContext } from './UserContext';
+import './index.css';
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,20 +9,23 @@ import {
 import Login from "./pages/login.jsx";
 import Navbar from "./components/navbar.jsx";
 import Signup from "./pages/signup.jsx";
+import Dashboard from "./pages/dashboard.jsx";
 
 function App() {
+  const [user, setUser] = useState(null); 
 
   return (
-    <>
+    <UserContext.Provider value={{ user, setUser }}>
       <Router>
         <Navbar />
         <Routes>
-         <Route path="/" element={<Login />}/>
-         <Route path="/signup" element={<Signup />}/>
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </Router>
-    </>
-  )
+    </UserContext.Provider>
+  );
 }
 
-export default App
+export default App;

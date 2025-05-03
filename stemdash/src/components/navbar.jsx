@@ -6,6 +6,7 @@ export default function Navbar() {
             <div className="flex justify-between items-center">
                 <div className="text-lg font-bold">stemdash</div>
                 <div className="flex gap-4">
+                    <Link to="/" className="hover:text-blue-300">Log In</Link>
                     <Link to="/signup" className="hover:text-blue-300">Sign Up</Link>
                 </div>
             </div>
