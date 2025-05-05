@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2';
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'; 
 import bcrypt from 'bcrypt';
 
 const app = express();
@@ -41,7 +41,7 @@ app.post('/signup', async function (req, res) {
       student_id, first_name, last_name, preferred_name,
       student_email, phone_number, student_gender,
       student_pronouns, student_grade, shirt_size, user_password
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
   `;
 
   try {
@@ -73,7 +73,7 @@ app.post('/signup', async function (req, res) {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, function () {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
@@ -97,7 +97,7 @@ app.post('/login', async function (req, res) {
         const user = results[0];
         const matching = await bcrypt.compare(user_password, user.user_password);
   
-        if (matching) {
+        if (matching) { 
           return res.json({ success: true, user });
         } else {
           return res.json({ success: false });
@@ -108,4 +108,40 @@ app.post('/login', async function (req, res) {
       return res.json({ success: false });
     }
   });
+
+  app.get('/clubInfo', function (req, res) {
+    const { club_id } = req.query;
+    const query = `SELECT * FROM clubs WHERE club_id = ?`;
+
+    pool.query(query, [club_id], function (err, results) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      return res.json(results);
+    }) 
+  })
+
+  app.get('/hubs', function (req, res) {
+    const { student_id } = req.query; // query for small messages ect. body for larger POST commands maybe
+    // selects club_id and club_name from user_to_club {table}
+    // but bc user_to_club only has student id and club id, 
+    // we join it with the clubs table
+    // but only join the rows where club id matches
+    // only for the id of our student_id
+    const query = `SELECT clubs.club_id, clubs.club_name 
+                    FROM user_to_club
+                    JOIN clubs
+                    ON user_to_club.club_id = clubs.club_id
+                    WHERE user_to_club.student_id = ?`;
+
+    pool.query(query, [student_id], function (err, results) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        return res.json(results);
+    });
+});
+
   

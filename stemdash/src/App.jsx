@@ -10,6 +10,7 @@ import Login from "./pages/login.jsx";
 import Navbar from "./components/navbar.jsx";
 import Signup from "./pages/signup.jsx";
 import Dashboard from "./pages/dashboard.jsx";
+import { Hub } from "./pages/hub.jsx";
 
 function App() {
   const [user, setUser] = useState(null); 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path ="/hub" element= {<Hub />} />
         </Routes>
       </Router>
     </UserContext.Provider>

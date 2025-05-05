@@ -37,10 +37,14 @@ export default function Login() {
     }
   }
 
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  }
+  function handleChange(event) {
+    const inputName = event.target.name;
+    const inputValue = event.target.value;
+    const updatedFormData = { ...formData };
+    updatedFormData[inputName] = inputValue;
+    setFormData(updatedFormData);
+}
+
 
   return (
     <>

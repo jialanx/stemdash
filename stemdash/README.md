@@ -82,4 +82,4 @@ INSERT INTO user_to_club VALUES (1039535, 2);
 
 SELECT * FROM clubs;
 SELECT * FROM user_to_club;
-SELECT * FROM user_profile;
+SELECT * FROM user_profile; 
