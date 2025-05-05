@@ -8,7 +8,7 @@ export function Hub() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const club_id = searchParams.get("club_id");
-
+ 
     function back() {
         navigate('/dashboard');
     }

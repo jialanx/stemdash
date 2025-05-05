@@ -7,12 +7,18 @@ export default function Dashboard() {
     const { user } = useUser();
     const [hubs, setHubs] = useState([]);
     const navigate = useNavigate();
-
+    const [createEventVisible, setEventVisible] = useState(false);
 
     if (!user) {
         navigate("/");
+    } 
+    
+    function createHub() {
+        console.log("creating hub");
+        setEventVisible(!createEventVisible);
+        console.log(createEventVisible);
     }
- 
+
     function submit (club_id) {
         navigate("/hub?club_id=" + club_id);
     }
@@ -42,6 +48,8 @@ export default function Dashboard() {
                 </button>
             );
         })}
+
+        <button onClick={createHub} className="m-2 border p-2">test</button>
         </>
     );
 }
