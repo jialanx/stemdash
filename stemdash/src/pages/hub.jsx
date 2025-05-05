@@ -7,7 +7,7 @@ export function Hub() {
     const [data, setData] = useState([]);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const club_id = searchParams.get("club_id")
+    const club_id = searchParams.get("club_id");
 
     function back() {
         navigate('/dashboard');
@@ -22,7 +22,7 @@ export function Hub() {
             console.error("error fetching hub info", err); 
         }
     }
-
+ 
     useEffect( function() {  
         if (user) {
             loadInfo(club_id);
@@ -34,9 +34,10 @@ export function Hub() {
         {data.map(function (hubContent) {
             return ( 
                 <h1 key={hubContent.club_id}>
-                    {hubContent.club_name}
+                    {hubContent.club_name} | member count:
+                    {hubContent.member_count}
                 </h1>
-            );
+            );  
         })}
         </>
     )

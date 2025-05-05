@@ -111,7 +111,15 @@ app.post('/login', async function (req, res) {
 
   app.get('/clubInfo', function (req, res) {
     const { club_id } = req.query;
-    const query = `SELECT * FROM clubs WHERE club_id = ?`;
+    const query = `SELECT 
+      clubs.club_id, 
+      clubs.club_name, 
+      COUNT(user_to_club.student_id) AS member_count
+      FROM clubs 
+      LEFT JOIN user_to_club 
+      ON user_to_club.club_id = clubs.club_id 
+      WHERE clubs.club_id = ?
+      GROUP BY clubs.club_id, clubs.club_name`;
 
     pool.query(query, [club_id], function (err, results) {
       if (err) {
