@@ -77,6 +77,17 @@ app.listen(PORT, function () {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
+app.post('/createNewClub', async function (req, res) {
+  const { club_name } = req.body;
+  const query = 'INSERT INTO clubs (club_name) VALUES (?)';
+  pool.query(query, [club_name], function (err, result) {
+    if (err) {
+      console.error("this is backend:", err);
+      return;
+    }
+    res.json({success: true});
+  })
+})
 
 app.post('/login', async function (req, res) {
     const { student_id, user_password } = req.body;
@@ -144,7 +155,7 @@ app.post('/login', async function (req, res) {
                     WHERE user_to_club.student_id = ?`;
 
     pool.query(query, [student_id], function (err, results) {
-        if (err) {
+        if (err) { 
             console.error(err);
             return;
         }

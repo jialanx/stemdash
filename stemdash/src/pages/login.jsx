@@ -45,7 +45,6 @@ export default function Login() {
     setFormData(updatedFormData);
 }
 
-
   return (
     <>
       <h1 style={{ color: '#2B5782' }} className="p-3 mb-10 font-bold text-2xl">Log In</h1>
