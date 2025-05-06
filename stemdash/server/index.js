@@ -77,17 +77,33 @@ app.listen(PORT, function () {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
-app.post('/createNewClub', async function (req, res) {
+app.post('/createNewClub', function (req, res) {
   const { club_name } = req.body;
+
   const query = 'INSERT INTO clubs (club_name) VALUES (?)';
-  pool.query(query, [club_name], function (err, result) {
+  pool.query(query, [club_name], function (err, insertResult) {
     if (err) {
-      console.error("this is backend:", err);
-      return;
+      console.error("Error inserting club:", err);
+      return res.json({ success: false });
     }
-    res.json({success: true});
-  })
-})
+
+    // Use insertId to get the club_id immediately
+    const club_id = insertResult.insertId;
+
+    pool.query(
+      'INSERT INTO user_to_club (student_id, club_id) VALUES (0, ?)',
+      [club_id],
+      function (err) {
+        if (err) {
+          console.error("Error adding user to club:", err);
+          return res.json({ success: false });
+        }
+
+        res.json({ success: true, club_id });
+      }
+    );
+  });
+});
 
 app.post('/login', async function (req, res) {
     const { student_id, user_password } = req.body;
