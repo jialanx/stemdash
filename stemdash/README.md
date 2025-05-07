@@ -53,6 +53,22 @@ CREATE TABLE team_to_student (
   FOREIGN KEY (student_id) REFERENCES user_profile(student_id)
 );
 
+CREATE TABLE event_to_club (
+  event_id INT,
+  club_id INT,
+  PRIMARY KEY (club_id, event_id),
+  FOREIGN KEY (event_id) REFERENCES event_profile(event_id),
+  FOREIGN KEY (club_id) REFERENCES clubs(club_id)
+);
+
+CREATE TABLE event_to_team (
+  event_id INT,
+  team_id INT,
+  PRIMARY KEY (event_id, team_id),
+  FOREIGN KEY (event_id) REFERENCES event_profile(event_id),
+  FOREIGN KEY (team_id) REFERENCES teams(team_id)
+);
+
 CREATE TABLE user_to_club (
   student_id INT,
   club_id INT,
@@ -78,8 +94,16 @@ INSERT INTO clubs VALUES (1, "Key Club");
 INSERT INTO clubs VALUES (2, "FBLA");
 INSERT INTO user_to_club VALUES (1039535, 1);
 INSERT INTO user_to_club VALUES (1039535, 2);
+INSERT INTO user_to_club VALUES (0, 1);
+INSERT INTO user_to_club VALUES (0, 2);
 
 
+INSERT INTO event_profile VALUES (1, "Digital Production");
+INSERT INTO event_profile VALUES (2, "Robotics");
+
+SELECT * from event_to_club;
 SELECT * FROM clubs;
 SELECT * FROM user_to_club;
-SELECT * FROM user_profile;
+SELECT * FROM user_profile;             
+
+ 

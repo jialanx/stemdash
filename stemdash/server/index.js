@@ -71,7 +71,7 @@ app.post('/signup', async function (req, res) {
   } catch (err) {
     console.error('Hashing error:', err);
   }
-});
+}); 
 
 app.listen(PORT, function () {
   console.log(`Server running on http://localhost:${PORT}`);
@@ -136,8 +136,23 @@ app.post('/login', async function (req, res) {
     }
   });
 
-  app.get('/clubInfo', function (req, res) {
+  app.get('/loadEvents', function (req, res) {
     const { club_id } = req.query;
+    const query = `SELECT event_profile.event_id, 
+                  event_profile.event_name FROM event_to_club
+                  JOIN event_profile ON event_to_club.event_id = event_profile.event_id 
+                  WHERE event_to_club.club_id = ?`;
+    pool.query(query, [club_id], function(err, results) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      return res.json(results);
+    })
+  });
+
+  app.get('/clubInfo', function (req, res) {
+    const { club_id } = req.query; 
     const query = `SELECT 
       clubs.club_id, 
       clubs.club_name, 
@@ -148,7 +163,7 @@ app.post('/login', async function (req, res) {
       WHERE clubs.club_id = ?
       GROUP BY clubs.club_id, clubs.club_name`;
 
-    pool.query(query, [club_id], function (err, results) {
+    pool.query(query, [club_id], function (err, results) { 
       if (err) {
         console.log(err);
         return;

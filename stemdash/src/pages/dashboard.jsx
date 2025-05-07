@@ -50,14 +50,15 @@ export default function Dashboard() {
         try {
             const res = await fetch("http://localhost:3001/createNewClub", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json" }, 
                 body: JSON.stringify({club_name: formData})
-              });
+              }); 
         
               const data = await res.json();
               console.log(data);
               if (res.ok) {
                 setFormData('');
+                loadHubs(user.student_id);
               }
               
         } catch (err) {
@@ -76,10 +77,11 @@ export default function Dashboard() {
             );
         })}
 
-        <button onClick={createHub} className="m-2 border p-2">Create New Hub</button>
-
-        {createEventVisible && ( // if statement
+        {user.student_id == 0 && (
         <>
+            <button onClick={createHub} className="m-2 border p-2">Create New Hub</button>
+ 
+            {createEventVisible && (
             <div className="flex justify-center items-center">
                 <div className="bg-red-500 w-60 h-40 border rounded-xl">
                 <form onSubmit={createClub}>
@@ -89,12 +91,14 @@ export default function Dashboard() {
                     value={formData}
                     onChange={handleChange}
                     placeholder="Create new hub"
-                    required />
+                    required 
+                    />
                 </form>
                 </div>
             </div>
-        </> 
-        )} 
+            )}
+        </>
+        )}
         </>
     );
 }
