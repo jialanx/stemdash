@@ -41,8 +41,7 @@ CREATE TABLE clubs (
 
 CREATE TABLE teams (
   team_id INT AUTO_INCREMENT PRIMARY KEY,
-  event_id INT,
-  FOREIGN KEY (event_id) REFERENCES event_profile(event_id)
+  member_count INT
 );
 
 CREATE TABLE team_to_student (

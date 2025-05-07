@@ -130,11 +130,66 @@ app.post('/login', async function (req, res) {
           return res.json({ success: false });
         }
       });
-    } catch (err) {
+    } catch (err) { 
       console.error('Hashing error:', err);
       return res.json({ success: false });
     }
   });
+
+
+  app.get('/listMyEvents', function (req, res) { 
+    const { student_id } = req.query;
+    const query = `SELECT event_profile.*, team_to_student.team_id FROM team_to_student
+                   JOIN event_to_team ON team_to_student.team_id = event_to_team.team_id
+                   JOIN event_profile ON event_to_team.event_id = event_profile.event_id
+                   WHERE team_to_student.student_id = ?`;
+
+    pool.query(query, [student_id], function (err, results) {
+      if (err) {
+        console.error("error listing events:", err);
+        return res.json({ success: false});
+      } 
+      return res.json({success: true, results});
+    })
+  })
+
+
+  app.post('/createTeam', function (req, res) {
+    const { event_id, student_id } = req.body;
+  
+    const query = `INSERT INTO teams (event_id) VALUES (?)`;
+  
+    pool.query(query, [event_id], function (err, results) {
+      if (err) {
+        console.error("Error inserting into teams:", err);
+        return res.json({ success: false });
+      }
+  
+      const team_id = results.insertId;
+  
+      const query2 = `INSERT INTO event_to_team (event_id, team_id) VALUES (?, ?)`;
+  
+      pool.query(query2, [event_id, team_id], function (err2) {
+        if (err2) {
+          console.error("Error inserting into event_to_team:", err);
+          return res.json({ success: false });
+        }
+
+        const query3 = `INSERT INTO team_to_student (team_id, student_id) VALUES (?, ?)`;
+
+        pool.query(query3, [team_id, student_id], function (err3) {
+          if (err3) {
+            console.error("error:", err3);
+            return res.json({success: false});
+          }
+          pool.query(query3, [team_id, 0], function() {
+            return res.json({success:true, team_id});
+          });
+        });
+      }); 
+    });
+  });
+  
 
   app.get('/loadEvents', function (req, res) {
     const { club_id } = req.query;
