@@ -24,9 +24,9 @@ app.post('/signup', async function (req, res) {
     student_id,
     first_name,
     last_name,
-    preferred_name,
+    preferred_name, 
     student_email,
-    phone_number,
+    phone_number, 
     student_gender,
     student_pronouns,
     student_grade,
@@ -89,7 +89,7 @@ app.post('/createNewClub', function (req, res) {
 
     // Use insertId to get the club_id immediately
     const club_id = insertResult.insertId;
-
+ 
     pool.query(
       'INSERT INTO user_to_club (student_id, club_id) VALUES (0, ?)',
       [club_id],
@@ -136,12 +136,23 @@ app.post('/login', async function (req, res) {
     }
   });
 
+  app.post('/joinTeam', function (req, res) {
+    const { student_id, team_id } = req.body;
+    const query = `INSERT INTO team_to_student (team_id, student_id) VALUES (?, ?)`;
+    pool.query(query, [team_id, student_id], function (err, results) {
+        if (err) {
+          console.log(err)
+          return(err);
+        }
+        return res.json({success:true});
+    })
+  })
 
   app.get('/listMyEvents', function (req, res) { 
     const { student_id, club_id } = req.query;
     const query = `SELECT event_profile.*, team_to_student.team_id FROM team_to_student
                    JOIN event_to_team ON team_to_student.team_id = event_to_team.team_id
-                   JOIN event_profile ON event_to_team.event_id = event_profile.event_id
+                   JOIN event_profile ON event_to_team.event_id = event_profile.event_id  
                    JOIN event_to_club ON event_profile.event_id = event_to_club.event_id
                    WHERE team_to_student.student_id = ? AND event_to_club.club_id = ?`;
     console.log('student_id:', student_id);
@@ -174,7 +185,7 @@ app.post('/login', async function (req, res) {
   
       pool.query(query2, [event_id, team_id], function (err2) {
         if (err2) {
-          console.error("Error inserting into event_to_team:", err);
+          console.error("Error inserting into event_to_team:", err2);
           return res.json({ success: false });
         }
 
