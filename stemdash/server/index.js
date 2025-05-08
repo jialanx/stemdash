@@ -138,13 +138,16 @@ app.post('/login', async function (req, res) {
 
 
   app.get('/listMyEvents', function (req, res) { 
-    const { student_id } = req.query;
+    const { student_id, club_id } = req.query;
     const query = `SELECT event_profile.*, team_to_student.team_id FROM team_to_student
                    JOIN event_to_team ON team_to_student.team_id = event_to_team.team_id
                    JOIN event_profile ON event_to_team.event_id = event_profile.event_id
-                   WHERE team_to_student.student_id = ?`;
+                   JOIN event_to_club ON event_profile.event_id = event_to_club.event_id
+                   WHERE team_to_student.student_id = ? AND event_to_club.club_id = ?`;
+    console.log('student_id:', student_id);
+    console.log('club_id:', club_id);
 
-    pool.query(query, [student_id], function (err, results) {
+    pool.query(query, [student_id, club_id], function (err, results) {
       if (err) {
         console.error("error listing events:", err);
         return res.json({ success: false});
@@ -153,7 +156,7 @@ app.post('/login', async function (req, res) {
     })
   })
 
-
+ 
   app.post('/createTeam', function (req, res) {
     const { event_id, student_id } = req.body;
   

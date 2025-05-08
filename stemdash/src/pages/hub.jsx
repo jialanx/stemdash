@@ -19,16 +19,18 @@ export function Hub() {
     }
 
     async function getEventInfo(event_profile) {
+        setPopupInfo(event_profile);
+        toggleEventPopupVisible(!eventPopupVisible);
+    }
+
+    async function getMyEvents(student_id) {
         try {
-            const res = await fetch(`http://localhost:3001/listMyEvents?student_id=${user.student_id}`)
+            const res = await fetch(`http://localhost:3001/listMyEvents?student_id=${student_id}&club_id=${club_id}`); 
             const data = await res.json();
             setMyEvents(data.results || []);
         } catch (err) {
             console.error("error getting events:", err);
         }
-
-        setPopupInfo(event_profile);
-        toggleEventPopupVisible(!eventPopupVisible);
     }
 
     async function loadInfo(club_id) {
@@ -48,6 +50,7 @@ export function Hub() {
     useEffect( function() {  
         if (user) { 
             loadInfo(club_id);
+            getMyEvents(user.student_id);
         }}, [user]); 
 
     async function createTeam() {
@@ -85,22 +88,25 @@ export function Hub() {
                 <button key={content.event_id} onClick={function () {getEventInfo(content)}} className="border m-2 p-1">{content.event_name}</button>
             ); 
         })}
-        { (user.student_id == 0) && (
+        <h2>My Teams</h2>
+        {myEvents.length === 0 ? (
+            <p>You are not on any teams.</p>
+        ) : (
+            myEvents.map(function (event) {
+                return(
+                <h3 key={`${event.event_id}-${event.team_id}`}>{event.event_name} - team: {event.team_id}</h3>
+            );
+        }))}
+        {(user.student_id == 0) && (
             <button className="border m-2 p-1">Create Event</button>
-        ) }
+        )}
                 { eventPopupVisible && (
                     <>
                     <h1 className="mt-5">{popupInfo.event_name}</h1> 
                     <button onClick={createTeam} className="border m-2 p-1">create Team</button>
                     <button className="border m-2 p-1">join Team</button>
-
-                    {myEvents.map(function (event) {
-                        return(
-                            <h1 key={event.event_id}>{event.event_name} team: {event.team_id}</h1>
-                        )
-                    })} 
                 </>         
                 )} 
             </>
     )}
-                      
+                         
