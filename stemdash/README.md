@@ -41,7 +41,8 @@ CREATE TABLE clubs (
 
 CREATE TABLE teams (
   team_id INT AUTO_INCREMENT PRIMARY KEY,
-  member_count INT
+  member_count INT,
+  event_id INT
 );
 
 CREATE TABLE team_to_student (
@@ -73,16 +74,8 @@ CREATE TABLE user_to_club (
   club_id INT,
   PRIMARY KEY (student_id, club_id),
   FOREIGN KEY (student_id) REFERENCES user_profile(student_id),
-  FOREIGN KEY (club_id) REFERENCES clubs(club_id)
+  FOREIGN KEY (club_id) REFERENCES clubs(club_id) 
 );
-
-
-CREATE TABLE messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 
 ---------------------------------
 

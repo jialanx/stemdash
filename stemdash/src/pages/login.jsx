@@ -12,17 +12,19 @@ export default function Login() {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
+  // when you submit your login information it will run this
   async function submit(e) {
-    e.preventDefault();
-    try {
-      const res = await fetch("http://localhost:3001/login", {
+    e.preventDefault(); // prevents page from reloading
+
+    try { 
+      const res = await fetch("http://localhost:3001/login", { // calls the login command in server/index.js
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
 
-      const data = await res.json();
-      setFormData({ student_id: '', user_password: '' });
+      const data = await res.json(); 
+      setFormData({ student_id: '', user_password: '' }); // clears form
 
       if (data.success) {
         setMessage("Login successful!");
@@ -37,6 +39,7 @@ export default function Login() {
     }
   }
 
+  // when you type in text box it will update all the values.
   function handleChange(event) {
     const inputName = event.target.name;
     const inputValue = event.target.value;
@@ -53,7 +56,7 @@ export default function Login() {
           {[
             ["student_id", "Student ID"],
             ["user_password", "Password"]
-          ].map(([id, label]) => (
+          ].map(([id, label]) => ( // for each item in this array, it will run the following lines
             <div key={id}>
               <label className="p-5 block font-bold text-2xl">{label}</label>
               <input

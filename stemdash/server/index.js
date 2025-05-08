@@ -9,9 +9,9 @@ const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
-
 dotenv.config();
 
+// connects to mySQL with information from .env file
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -19,6 +19,9 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME
 });
 
+// post commands - for editing DB
+// this takes the signup information, 
+// hashes the password, and inserts it into user_profile
 app.post('/signup', async function (req, res) {
   const {
     student_id,
@@ -73,9 +76,12 @@ app.post('/signup', async function (req, res) {
   }
 }); 
 
+// tells user if the server is running
 app.listen(PORT, function () {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// takes in a club name, inserts it into clubs table and returns the club_id
 
 app.post('/createNewClub', function (req, res) {
   const { club_name } = req.body;
@@ -90,6 +96,8 @@ app.post('/createNewClub', function (req, res) {
     // Use insertId to get the club_id immediately
     const club_id = insertResult.insertId;
  
+    // gives coordinator access to this club by connecting its student ID to the club ID 
+    // in user_to_club table
     pool.query(
       'INSERT INTO user_to_club (student_id, club_id) VALUES (0, ?)',
       [club_id],
@@ -105,6 +113,8 @@ app.post('/createNewClub', function (req, res) {
   });
 });
 
+// takes in student_id and password, checks if they match a profile from user_profile
+// if it does, it returns true and gives the user's information.
 app.post('/login', async function (req, res) {
     const { student_id, user_password } = req.body;
   
@@ -121,7 +131,7 @@ app.post('/login', async function (req, res) {
           return res.json({success: false});
         }
   
-        const user = results[0];
+        const user = results[0]; // results[0] -> everything in the row
         const matching = await bcrypt.compare(user_password, user.user_password);
   
         if (matching) { 
@@ -136,6 +146,8 @@ app.post('/login', async function (req, res) {
     }
   });
 
+  // takes in the student_id and the team_id that student is trying to join
+  // adds it into the team_to_student table
   app.post('/joinTeam', function (req, res) {
     const { student_id, team_id } = req.body;
     const query = `INSERT INTO team_to_student (team_id, student_id) VALUES (?, ?)`;
@@ -148,6 +160,9 @@ app.post('/login', async function (req, res) {
     })
   })
 
+  // takes in student_id and the club they are looking at
+  // joins event_profile, event_to_team, and team_to_student tables. 
+  // gives each event profile that has the student within a team and from that club
   app.get('/listMyEvents', function (req, res) { 
     const { student_id, club_id } = req.query;
     const query = `SELECT event_profile.*, team_to_student.team_id FROM team_to_student
@@ -168,10 +183,12 @@ app.post('/login', async function (req, res) {
   })
 
  
+  // gets the event and the student that wants to create the team,
+  // adds the new team and returns the ID
   app.post('/createTeam', function (req, res) {
     const { event_id, student_id } = req.body;
   
-    const query = `INSERT INTO teams (event_id) VALUES (?)`;
+    const query = `INSERT INTO teams (event_id) VALUES (?)`; // creates the team
   
     pool.query(query, [event_id], function (err, results) {
       if (err) {
@@ -181,7 +198,7 @@ app.post('/login', async function (req, res) {
   
       const team_id = results.insertId;
   
-      const query2 = `INSERT INTO event_to_team (event_id, team_id) VALUES (?, ?)`;
+      const query2 = `INSERT INTO event_to_team (event_id, team_id) VALUES (?, ?)`; // connects the event and team together
   
       pool.query(query2, [event_id, team_id], function (err2) {
         if (err2) {
@@ -189,14 +206,14 @@ app.post('/login', async function (req, res) {
           return res.json({ success: false });
         }
 
-        const query3 = `INSERT INTO team_to_student (team_id, student_id) VALUES (?, ?)`;
+        const query3 = `INSERT INTO team_to_student (team_id, student_id) VALUES (?, ?)`; // adds the creater of the team to the team
 
         pool.query(query3, [team_id, student_id], function (err3) {
           if (err3) {
             console.error("error:", err3);
             return res.json({success: false});
           }
-          pool.query(query3, [team_id, 0], function() {
+          pool.query(query3, [team_id, 0], function() { // adds the coordinator to the team
             return res.json({success:true, team_id});
           });
         });
@@ -204,7 +221,8 @@ app.post('/login', async function (req, res) {
     });
   });
   
-
+  // Joins together event and club connection with event profile
+  // takes the event id and name from the events in a club.
   app.get('/loadEvents', function (req, res) {
     const { club_id } = req.query;
     const query = `SELECT event_profile.event_id, 
@@ -220,6 +238,8 @@ app.post('/login', async function (req, res) {
     })
   });
 
+  // get methods only send info back - doesn't change existing DBs
+  // takes in the club_id, returns club info with that ID
   app.get('/clubInfo', function (req, res) {
     const { club_id } = req.query; 
     const query = `SELECT 
@@ -241,6 +261,7 @@ app.post('/login', async function (req, res) {
     }) 
   })
 
+  // takes in a student_id and checks all clubs that they are connected to
   app.get('/hubs', function (req, res) {
     const { student_id } = req.query; // query for small messages ect. body for larger POST commands maybe
     // selects club_id and club_name from user_to_club {table}

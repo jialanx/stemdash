@@ -15,26 +15,35 @@ export function Hub() {
     const [formData, setFormData] = useState('');
     const [joinTeamVisible, setJoinTeamVisible] = useState(false);
 
+    // return to login if not logged in
+    if (!user) {
+        navigate("/");
+    } 
 
+    // edits textbox data when typed in
     function handleChange(event) {
         setFormData(event.target.value);
     }
 
+    // toggles visibility textbox asking to join team
     function showJoinTeam() {
         setJoinTeamVisible(!joinTeamVisible);
     }
 
+    // when back button is pressed it will return you to dashboard page
     function back() {
         navigate('/dashboard');
     }
 
+    // toggles popup for event information
     function getEventInfo(event_profile) {
         setPopupInfo(event_profile);
         toggleEventPopupVisible(!eventPopupVisible);
     }
 
     
-
+    // takes a student id and connects to server/index.js to get all events student is in
+    // sets the corrosponding variable
     async function getMyEvents(student_id) {
         try {
             const res = await fetch(`http://localhost:3001/listMyEvents?student_id=${student_id}&club_id=${club_id}`); 
@@ -45,13 +54,14 @@ export function Hub() {
         }
     }
 
+    // takes club id and shows the information from it (by contacting backend)
     async function loadInfo(club_id) {
         try { 
-            const res = await fetch(`http://localhost:3001/clubInfo?club_id=${club_id}`); 
+            const res = await fetch(`http://localhost:3001/clubInfo?club_id=${club_id}`); // shows club info
             const data = await res.json(); 
             setData(data);
 
-            const res2 = await fetch(`http://localhost:3001/loadEvents?club_id=${club_id}`);
+            const res2 = await fetch(`http://localhost:3001/loadEvents?club_id=${club_id}`); // shows events that the student is in
             const data2 = await res2.json();
             setEventData(data2); 
         } catch (err) { 
@@ -59,12 +69,14 @@ export function Hub() {
         } 
     }
  
+    // runs the correspodning functions when user variable is changed
     useEffect( function() {  
         if (user) { 
             loadInfo(club_id);
             getMyEvents(user.student_id);
         }}, [user]); 
- 
+        
+        // takes in an event_id and contacts backend with it
         async function createTeam(event_id) {
             try {
                 const res = await fetch(`http://localhost:3001/createTeam`, {
@@ -82,6 +94,7 @@ export function Hub() {
             }
         }
 
+        // connects to backend to join a team
     async function joinTeam(e) {
         e.preventDefault();
         try {
@@ -104,7 +117,7 @@ export function Hub() {
     return ( 
         <>
         <button onClick={back} className="border p-2 m-10 absolute top-4 right-0">back</button>
-        {data.map(function (hubContent) {
+        {data.map(function (hubContent) { // information on the content of the hub
             return ( 
                 <h1 className="font-bold p-2 w-10" key={hubContent.club_id}>
                     {hubContent.club_name} | member count:
@@ -116,26 +129,26 @@ export function Hub() {
 
         <h1 className="mt-10">events:</h1>
 
-        {eventData.map(function (content) {
+        {eventData.map(function (content) { // maps all events the student is in
             return (
                 <button key={content.event_id} onClick={function () {getEventInfo(content)}} className="border m-2 p-1">{content.event_name}</button>
             ); 
         })}
 
         <h2>My Teams</h2>
-        {myEvents.length === 0 ? (
+        {myEvents.length === 0 ? ( // if i am in no events (=== 0), I will say im in no teams
             <p>You are not on any teams.</p>
-        ) : (
-            myEvents.map(function (event) {
+        ) : ( // else
+            myEvents.map(function (event) { // loop through all my events to state what they are
                 return(
                 <h3 key={`${event.event_id}-${event.team_id}`}>{event.event_name} - team: {event.team_id}</h3>
             );
         }))}
 
-        {(user.student_id == 0) && ( 
+        {(user.student_id == 0) && (  // if i am the coordinator i will have a create event button
             <button className="border m-2 p-1">Create Event</button>
         )}
-                { eventPopupVisible && (
+                { eventPopupVisible && ( // if eventPopupVisible is true i will show buttons to create and join team for this event
                     <>
                     <h1 className="mt-5">{popupInfo.event_name}</h1> 
                     <button onClick={function() {createTeam(popupInfo.event_id)}} className="border m-2 p-1">create Team</button> 
@@ -143,7 +156,7 @@ export function Hub() {
                 </>         
                 )} 
  
-            {joinTeamVisible && (
+            {joinTeamVisible && ( // if i click the create team button joinTeamVisible will be toggled, showing a textbox
             <div className="flex justify-center items-center">
                 <div className="bg-red-500 w-60 h-40 border rounded-xl">
                 <form onSubmit={joinTeam}>

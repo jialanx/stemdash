@@ -16,6 +16,7 @@ export default function Signup() {
     })
     const [message, setMessage] = useState("");
 
+    // updates information if textbox is typed in
     function handleChange(e) {
         const key = e.target.name;
         const value = e.target.value;
@@ -26,6 +27,7 @@ export default function Signup() {
         });
     }
 
+    // connects to backend when information is submitted
     async function handleSubmit(e) {
         e.preventDefault();
         try {
@@ -76,7 +78,7 @@ export default function Signup() {
                     ["student_grade", "Grade"],
                     ["shirt_size", "Shirt Size"],
                     ["user_password", "User Password"]
-                ].map(function ([id, label]) {
+                ].map(function ([id, label]) { // for each of these, run the command below (displays their textbox and titles)
                     return (
                         <div key={id}>
                             <label className="p-5 block font-bold text-2xl">{label}</label>

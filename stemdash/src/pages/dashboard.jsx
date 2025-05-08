@@ -10,20 +10,23 @@ export default function Dashboard() {
     const [createEventVisible, setEventVisible] = useState(false);
     const [formData, setFormData] = useState('');
 
+    // return to login if user is not logged in
     if (!user) {
         navigate("/");
     } 
     
+    // toggles visibility for textbox to create a hub
     function createHub() {
-        console.log("creating hub");
         setEventVisible(!createEventVisible);
         console.log(createEventVisible);
     }
 
+    // takes in a club id and moves to a different page
     function submit (club_id) {
         navigate("/hub?club_id=" + club_id);
     }
 
+    // connects to backend, takes in student ID and shows all the hubs that this student is in
     async function loadHubs(id) {
         try {
             const res = await fetch(`http://localhost:3001/hubs?student_id=${id}`)
@@ -34,15 +37,18 @@ export default function Dashboard() {
         }
     }
 
+    // runs the load hubs every single time the user ID changes
     useEffect( function () {
         if (user) {
             loadHubs(user.student_id);
         }}, [user]); 
 
+    // updates the textbox when it is typed in
     function handleChange(event) {
         setFormData(event.target.value);
     }
 
+    // connects to backend, sends club name info to create a new club.
     async function createClub(e) {
         e.preventDefault();
         console.log("club:", formData);
@@ -69,7 +75,7 @@ export default function Dashboard() {
     return (
         <>
         
-        {hubs.map(function (hubContent) {
+        {hubs.map(function (hubContent) { // shows all the hubs the user is in
             return ( 
                 <button onClick={function () {submit(hubContent.club_id)}} className="m-2 border p-2" key={hubContent.club_id}>
                     {hubContent.club_name}
@@ -77,7 +83,7 @@ export default function Dashboard() {
             );
         })}
 
-        {user.student_id == 0 && (
+        {user.student_id == 0 && ( // if the user is the coordinator, it will show a create new hub option
         <>
             <button onClick={createHub} className="m-2 border p-2">Create New Hub</button>
  
