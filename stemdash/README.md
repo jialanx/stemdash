@@ -8,6 +8,7 @@ mysql2
 cors
 dotenv
 express
+papaparse
 bcrypt
 
 CREATE DATABASE stemdash;

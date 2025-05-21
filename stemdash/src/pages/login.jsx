@@ -1,6 +1,28 @@
 import { useState, useContext } from 'react';
 import { UserContext } from "../UserContext";
 import { useNavigate } from 'react-router-dom';
+import Papa from 'papaparse';
+
+//
+
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    Papa.parse(file, {
+      header: true, // Parses the CSV into an array of objects
+      skipEmptyLines: true,
+      complete: (results) => {
+        console.log('Parsed Data:', results.data);
+      },
+      error: (error) => {
+        console.error('Error parsing CSV:', error);
+      },
+    });
+  }
+};
+
+//
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -75,6 +97,10 @@ export default function Login() {
           {message && <p className="mt-5 text-red-500">{message}</p>}
         </form>
       </div>
+      <div>
+        <h1>Upload CSV File</h1>
+        <input className='border m-2' type="file" accept=".csv" onChange={handleFileUpload} />
+    </div>
     </>
   );
 }
